@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI Literacy Quest</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#eef2ff;color:#172033}
+.wrap{max-width:920px;margin:auto;padding:25px 16px}.card{background:#fff;border-radius:24px;padding:30px;box-shadow:0 10px 35px rgba(0,0,0,.1)}
+h1{font-size:36px;margin:10px 0}h2{font-size:26px}.muted{color:#667085;line-height:1.6}
+button{border:0;border-radius:13px;padding:13px 19px;font-size:16px;cursor:pointer;background:#263238;color:#fff}
+button:hover{transform:translateY(-1px)}.primary{font-size:18px;padding:15px 24px}
+.map{display:grid;gap:14px;margin:25px 0}.mission{border:2px solid #dbe2f0;border-radius:18px;padding:18px;display:flex;align-items:center;gap:16px}
+.mission.locked{opacity:.5}.icon{font-size:34px}.mission h3{margin:0 0 5px}.badge{display:inline-block;border-radius:99px;padding:7px 12px;background:#e0e7ff;font-weight:bold}
+.top{display:flex;justify-content:space-between;gap:10px;align-items:center}.progress{height:9px;background:#e5e7eb;border-radius:20px;overflow:hidden;margin:15px 0}.bar{height:100%;background:#4f46e5;width:0}
+.option{display:block;width:100%;text-align:left;margin:10px 0;background:#eef2ff;color:#172033}.correct{background:#dcfce7!important}.wrong{background:#fee2e2!important}
+.feedback{padding:17px;border-radius:15px;background:#f8fafc;margin-top:16px;line-height:1.6}.tip{margin-top:12px;padding:13px;border-left:4px solid #6366f1;background:#eef2ff}
+.badges{display:flex;flex-wrap:wrap;gap:12px;margin:20px 0}.earned{padding:14px 16px;border-radius:15px;background:#f1f5f9}
+.profile{display:grid;gap:12px;margin:20px 0}.skill{display:grid;grid-template-columns:150px 1fr;align-items:center;gap:10px}.stars{letter-spacing:2px}
+.hidden{display:none}.center{text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="card" id="home">
+<span class="badge">🎮 AI Literacy Quest</span>
+<h1>Can you become AI Literate?</h1>
+<p class="muted">Complete three missions. Question AI. Check information. Make responsible choices. Build better prompts.</p>
+<div class="map">
+<div class="mission"><div class="icon">🔍</div><div><h3>Mission 1 — AI Detective</h3><div class="muted">Find the clues. Question AI-generated information.</div></div></div>
+<div class="mission"><div class="icon">⚖️</div><div><h3>Mission 2 — Make the Right Choice</h3><div class="muted">Decide how AI should be used in real student situations.</div></div></div>
+<div class="mission"><div class="icon">🧠</div><div><h3>Mission 3 — Prompt Lab</h3><div class="muted">Turn weak prompts into useful ones.</div></div></div>
+</div>
+<button class="primary" onclick="start()">Start Mission 1 →</button>
+</div>
+
+<div class="card hidden" id="game">
+<div class="top"><span class="badge" id="mission"></span><span id="count" class="muted"></span></div>
+<div class="progress"><div class="bar" id="bar"></div></div>
+<div id="q"></div>
+</div>
+
+<div class="card hidden center" id="result">
+<span class="badge">🏆 QUEST COMPLETE</span>
+<h1>You are AI Literate!</h1>
+<p id="score" class="muted"></p>
+<div class="badges" id="badges"></div>
+<h2>Your AI Literacy Profile</h2>
+<div class="profile" id="profile"></div>
+<p id="message" class="muted"></p>
+<button onclick="location.reload()">Play Again</button>
+</div>
+</div>
+
+<script>
+const data=[
+{m:"🔍 Mission 1 — AI Detective",badge:"🔎 Fact Checker",skill:"Fact Checking",items:[
+{q:"An AI tool gives you a statistic with a confident explanation. What should you do?",a:["Accept it because the answer sounds convincing.","Check the statistic against a reliable source.","Ask the same AI tool whether it is correct."],c:1,tip:"AI can generate plausible but inaccurate facts. Verification is one of the most important AI literacy skills."},
+{q:"An AI-generated answer includes a citation. What is the safest next step?",a:["Trust it because there is a citation.","Open the source and check whether it really supports the claim.","Use the citation only if the title sounds academic."],c:1,tip:"A citation does not automatically make a claim reliable. Check the original source."},
+{q:"Which statement about AI-generated text is most accurate?",a:["AI-generated text is always easy to identify.","AI-generated text is always factually wrong.","AI-generated text can sound convincing and still contain errors."],c:2,tip:"Fluent language is not evidence of accuracy. Critical evaluation still matters."}
+]},
+{m:"⚖️ Mission 2 — Make the Right Choice",badge:"⚖️ Responsible User",skill:"Responsible AI Use",items:[
+{q:"You ask AI to explain a difficult grammar point and then complete the exercises yourself.",a:["🟢 GO — Responsible use","🟡 THINK — Use with caution","🔴 STOP — Inappropriate use"],c:0,tip:"Using AI as a tutor can support learning when you remain actively involved."},
+{q:"You ask AI to write your whole assignment and submit it as your own.",a:["🟢 GO — Responsible use","🟡 THINK — Use with caution","🔴 STOP — Inappropriate use"],c:2,tip:"Submitting AI-generated work as your own can violate academic integrity and removes the learning process."},
+{q:"You use AI to brainstorm three essay topics, then research, think and write the essay yourself.",a:["🟢 GO — Responsible use","🟡 THINK — Use with caution","🔴 STOP — Inappropriate use"],c:0,tip:"Brainstorming can be a productive AI use when the student remains responsible for the thinking and final work."}
+]},
+{m:"🧠 Mission 3 — Prompt Lab",badge:"🧠 Prompt Builder",skill:"Prompting",items:[
+{q:"Which prompt gives AI the most useful guidance?",a:["Write something about climate change.","You are an English tutor. Give me three B1-level arguments for and against reducing plastic use.","Climate change essay."],c:1,tip:"Useful prompts often include context, a clear task, a target level and output requirements."},
+{q:"What is the most useful improvement to a vague prompt?",a:["Add more emojis.","Add relevant context and clear instructions.","Make it shorter and remove all context."],c:1,tip:"Context helps AI understand what you need and produce a more relevant response."},
+{q:"You want feedback on your paragraph. Which instruction best supports learning?",a:["Fix this.","Make this perfect.","Give feedback on grammar, vocabulary and clarity. Do not rewrite it; explain the main problems."],c:2,tip:"Specific instructions can make AI a feedback tool rather than a replacement for your own writing."}
+]}
+];
+
+let mi=0,qi=0,total=0,correctBy=[0,0,0];
+
+function start(){document.getElementById("home").classList.add("hidden");document.getElementById("game").classList.remove("hidden");show()}
+function show(){
+ const sec=data[mi],x=sec.items[qi];answered=false;
+ document.getElementById("mission").textContent=sec.m;
+ document.getElementById("count").textContent=`Question ${qi+1} of ${sec.items.length}`;
+ document.getElementById("bar").style.width=((qi)/sec.items.length*100)+"%";
+ let s=`<h2>${x.q}</h2>`;
+ x.a.forEach((o,n)=>s+=`<button class="option" onclick="answer(${n},this)">${o}</button>`);
+ s+=`<div id="fb" class="feedback hidden"></div>`;
+ document.getElementById("q").innerHTML=s;
+}
+function answer(n,btn){
+ if(answered)return;answered=true;
+ const sec=data[mi],x=sec.items[qi];
+ document.querySelectorAll(".option").forEach((b,j)=>{if(j===x.c)b.classList.add("correct")});
+ if(n===x.c){total++;correctBy[mi]++;btn.classList.add("correct");}
+ else btn.classList.add("wrong");
+ const fb=document.getElementById("fb");
+ fb.classList.remove("hidden");
+ fb.innerHTML=(n===x.c?"<strong>✓ Correct!</strong> ":"<strong>Not quite.</strong> ")+
+ `<div class="tip">💡 <strong>AI Tip:</strong> ${x.tip}</div>
+ <br><button onclick="next()">${qi===sec.items.length-1?(mi===2?"See my profile":"Next mission →"):"Next challenge →"}</button>`;
+}
+function next(){
+ qi++;
+ if(qi<data[mi].items.length){show();return}
+ mi++;qi=0;
+ if(mi<data.length){show();return}
+ finish();
+}
+function finish(){
+ document.getElementById("game").classList.add("hidden");document.getElementById("result").classList.remove("hidden");
+ document.getElementById("score").textContent=`You scored ${total} out of 9.`;
+ const badges=document.getElementById("badges");
+ data.forEach((d,i)=>{if(correctBy[i]>=2)badges.innerHTML+=`<div class="earned">${d.badge}<br><small>Mission ${i+1} completed</small></div>`});
+ const p=document.getElementById("profile");
+ data.forEach((d,i)=>{let n=correctBy[i];p.innerHTML+=`<div class="skill"><strong>${d.skill}</strong><span class="stars">${"★".repeat(n)}${"☆".repeat(3-n)}</span></div>`});
+ let msg=total>=8?"Outstanding! You question AI, verify information and use AI thoughtfully.":total>=6?"Great job! You are developing strong AI literacy habits.":"Good start! Keep practicing: being AI literate means questioning, checking and making informed choices.";
+ document.getElementById("message").textContent=msg;
+}
+</script>
+</body>
+</html>
