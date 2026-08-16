@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Yapay Zeka Okuryazarlığı Görevi</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#eef2ff;color:#172033}
+.wrap{max-width:920px;margin:auto;padding:25px 16px}.card{background:#fff;border-radius:24px;padding:30px;box-shadow:0 10px 35px rgba(0,0,0,.1)}
+h1{font-size:36px;margin:10px 0}h2{font-size:26px}.muted{color:#667085;line-height:1.6}
+button{border:0;border-radius:13px;padding:13px 19px;font-size:16px;cursor:pointer;background:#263238;color:#fff}
+button:hover{transform:translateY(-1px)}.primary{font-size:18px;padding:15px 24px}
+.map{display:grid;gap:14px;margin:25px 0}.mission{border:2px solid #dbe2f0;border-radius:18px;padding:18px;display:flex;align-items:center;gap:16px}
+.mission.locked{opacity:.5}.icon{font-size:34px}.mission h3{margin:0 0 5px}.badge{display:inline-block;border-radius:99px;padding:7px 12px;background:#e0e7ff;font-weight:bold}
+.top{display:flex;justify-content:space-between;gap:10px;align-items:center}.progress{height:9px;background:#e5e7eb;border-radius:20px;overflow:hidden;margin:15px 0}.bar{height:100%;background:#4f46e5;width:0}
+.option{display:block;width:100%;text-align:left;margin:10px 0;background:#eef2ff;color:#172033}.correct{background:#dcfce7!important}.wrong{background:#fee2e2!important}
+.feedback{padding:17px;border-radius:15px;background:#f8fafc;margin-top:16px;line-height:1.6}.tip{margin-top:12px;padding:13px;border-left:4px solid #6366f1;background:#eef2ff}
+.badges{display:flex;flex-wrap:wrap;gap:12px;margin:20px 0}.earned{padding:14px 16px;border-radius:15px;background:#f1f5f9}
+.profile{display:grid;gap:12px;margin:20px 0}.skill{display:grid;grid-template-columns:150px 1fr;align-items:center;gap:10px}.stars{letter-spacing:2px}
+.hidden{display:none}.center{text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="card" id="home">
+<span class="badge">🎮 Yapay Zeka Okuryazarlığı Görevi</span>
+<h1>Yapay Zeka Okuryazarı Olabilir misin?</h1>
+<p class="muted">Üç görevi tamamla. Yapay zekayı sorgula. Bilgileri doğrula. Sorumlu seçimler yap. Daha iyi komutlar oluştur.</p>
+<div class="map">
+<div class="mission"><div class="icon">🔍</div><div><h3>Görev 1 — Yapay Zeka Dedektifi</h3><div class="muted">İpuçlarını bul. Yapay zeka tarafından üretilen bilgileri sorgula.</div></div></div>
+<div class="mission"><div class="icon">⚖️</div><div><h3>Görev 2 — Doğru Seçimi Yap</h3><div class="muted">Gerçek öğrenci durumlarında yapay zekanın nasıl kullanılması gerektiğine karar ver.</div></div></div>
+<div class="mission"><div class="icon">🧠</div><div><h3>Görev 3 — Komut Laboratuvarı</h3><div class="muted">Zayıf komutları etkili komutlara dönüştür.</div></div></div>
+</div>
+<button class="primary" onclick="start()">1. Görevi Başlat →</button>
+</div>
+
+<div class="card hidden" id="game">
+<div class="top"><span class="badge" id="mission"></span><span id="count" class="muted"></span></div>
+<div class="progress"><div class="bar" id="bar"></div></div>
+<div id="q"></div>
+</div>
+
+<div class="card hidden center" id="result">
+<span class="badge">🏆 GÖREV TAMAMLANDI</span>
+<h1>Yapay Zeka Okuryazarısın!</h1>
+<p id="score" class="muted"></p>
+<div class="badges" id="badges"></div>
+<h2>Yapay Zeka Okuryazarlığı Profilin</h2>
+<div class="profile" id="profile"></div>
+<p id="message" class="muted"></p>
+<button onclick="location.reload()">Tekrar Oyna</button>
+</div>
+</div>
+
+<script>
+const data=[
+{m:"🔍 Görev 1 — Yapay Zeka Dedektifi",badge:"🔎 Bilgi Doğrulayıcı",skill:"Bilgi Doğrulama",items:[
+{q:"Bir yapay zeka aracı sana kendinden emin bir açıklamayla bir istatistik veriyor. Ne yapmalısın?",a:["Yanıt ikna edici göründüğü için kabul etmelisin.","İstatistiği güvenilir bir kaynakla karşılaştırarak doğrulamalısın.","Aynı yapay zeka aracına doğru olup olmadığını sormalısın."],c:1,tip:"Yapay zeka kulağa inandırıcı gelen ancak yanlış bilgiler üretebilir. Doğrulama, yapay zeka okuryazarlığının en önemli becerilerinden biridir."},
+{q:"Yapay zeka tarafından üretilen bir yanıtta kaynak gösterilmiş. En güvenli sonraki adım nedir?",a:["Kaynak gösterildiği için güvenmek.","Kaynağı açıp gerçekten iddiayı destekleyip desteklemediğini kontrol etmek.","Kaynağı yalnızca başlığı akademik görünüyorsa kullanmak."],c:1,tip:"Bir kaynağın gösterilmiş olması iddianın otomatik olarak güvenilir olduğu anlamına gelmez. Orijinal kaynağı kontrol et."},
+{q:"Yapay zeka tarafından üretilen metinlerle ilgili en doğru ifade hangisidir?",a:["Yapay zeka tarafından üretilen metinleri ayırt etmek her zaman kolaydır.","Yapay zeka tarafından üretilen metinler her zaman bilgi açısından yanlıştır.","Yapay zeka tarafından üretilen bir metin ikna edici görünebilir ve yine de hatalar içerebilir."],c:2,tip:"Akıcı bir dil, doğruluğun kanıtı değildir. Eleştirel değerlendirme yine de önemlidir."}
+]},
+{m:"⚖️ Görev 2 — Doğru Seçimi Yap",badge:"⚖️ Sorumlu Kullanıcı",skill:"Sorumlu Yapay Zeka Kullanımı",items:[
+{q:"Yapay zekadan anlamadığın zor bir dil bilgisi konusunu açıklamasını istiyor, ardından alıştırmaları kendin yapıyorsun.",a:["🟢 DEVAM — Sorumlu kullanım","🟡 DÜŞÜN — Dikkatli kullan","🔴 DUR — Uygun değil"],c:0,tip:"Yapay zekayı öğretmen gibi kullanmak, öğrenme sürecine aktif olarak dahil olduğunda öğrenmeyi destekleyebilir."},
+{q:"Yapay zekadan ödevinin tamamını yazmasını istiyor ve kendi çalışmanmış gibi teslim ediyorsun.",a:["🟢 DEVAM — Sorumlu kullanım","🟡 DÜŞÜN — Dikkatli kullan","🔴 DUR — Uygun değil"],c:2,tip:"Yapay zeka tarafından üretilen bir çalışmayı kendi çalışmanmış gibi teslim etmek akademik dürüstlük ilkelerini ihlal edebilir ve gerçek öğrenme sürecini ortadan kaldırır."},
+{q:"Yapay zekayı üç kompozisyon konusu için beyin fırtınası yapmak amacıyla kullanıyor, ardından araştırmayı, düşünmeyi ve yazmayı kendin yapıyorsun.",a:["🟢 DEVAM — Sorumlu kullanım","🟡 DÜŞÜN — Dikkatli kullan","🔴 DUR — Uygun değil"],c:0,tip:"Öğrenci düşünme sürecinden ve nihai çalışmadan sorumlu olmaya devam ettiği sürece beyin fırtınası yaparken yapay zekadan yararlanmak verimli bir kullanım olabilir."}
+]},
+{m:"🧠 Görev 3 — Komut Laboratuvarı",badge:"🧠 Komut Oluşturucu",skill:"Komut Oluşturma",items:[
+{q:"Hangi komut yapay zekaya en yararlı yönlendirmeyi sağlar?",a:["İklim değişikliği hakkında bir şeyler yaz.","Sen bir İngilizce öğretmenisin. Plastik kullanımını azaltmanın lehinde ve aleyhinde B1 düzeyinde üçer argüman ver.","İklim değişikliği kompozisyonu."],c:1,tip:"Etkili komutlar genellikle bağlam, açık bir görev, hedef düzey ve çıktı gereksinimleri içerir."},
+{q:"Belirsiz bir komutu geliştirmek için en yararlı ekleme hangisidir?",a:["Daha fazla emoji eklemek.","İlgili bağlam ve açık yönergeler eklemek.","Kısaltmak ve tüm bağlamı kaldırmak."],c:1,tip:"Bağlam, yapay zekanın neye ihtiyacın olduğunu anlamasına ve daha ilgili bir yanıt üretmesine yardımcı olur."},
+{q:"Paragrafın hakkında geri bildirim almak istiyorsun. Hangi yönerge öğrenmeyi en iyi şekilde destekler?",a:["Bunu düzelt.","Bunu mükemmel hale getir.","Dil bilgisi, kelime bilgisi ve açıklık açısından geri bildirim ver. Paragrafı yeniden yazma; temel sorunları açıkla."],c:2,tip:"Açık ve belirli yönergeler, yapay zekanın kendi yazının yerine geçmek yerine bir geri bildirim aracı olarak kullanılmasını sağlayabilir."}
+]}
+];
+
+let mi=0,qi=0,total=0,correctBy=[0,0,0];
+
+function start(){document.getElementById("home").classList.add("hidden");document.getElementById("game").classList.remove("hidden");show()}
+function show(){
+ const sec=data[mi],x=sec.items[qi];answered=false;
+ document.getElementById("mission").textContent=sec.m;
+ document.getElementById("count").textContent=`Soru ${qi+1} / ${sec.items.length}`;
+ document.getElementById("bar").style.width=((qi)/sec.items.length*100)+"%";
+ let s=`<h2>${x.q}</h2>`;
+ x.a.forEach((o,n)=>s+=`<button class="option" onclick="answer(${n},this)">${o}</button>`);
+ s+=`<div id="fb" class="feedback hidden"></div>`;
+ document.getElementById("q").innerHTML=s;
+}
+function answer(n,btn){
+ if(answered)return;answered=true;
+ const sec=data[mi],x=sec.items[qi];
+ document.querySelectorAll(".option").forEach((b,j)=>{if(j===x.c)b.classList.add("correct")});
+ if(n===x.c){total++;correctBy[mi]++;btn.classList.add("correct");}
+ else btn.classList.add("wrong");
+ const fb=document.getElementById("fb");
+ fb.classList.remove("hidden");
+ fb.innerHTML=(n===x.c?"<strong>✓ Doğru!</strong> ":"<strong>Tam değil.</strong> ")+
+ `<div class="tip">💡 <strong>Yapay Zeka İpucu:</strong> ${x.tip}</div>
+ <br><button onclick="next()">${qi===sec.items.length-1?(mi===2?"Profilimi gör":"Sonraki göreve geç →"):"Sonraki soru →"}</button>`;
+}
+function next(){
+ qi++;
+ if(qi<data[mi].items.length){show();return}
+ mi++;qi=0;
+ if(mi<data.length){show();return}
+ finish();
+}
+function finish(){
+ document.getElementById("game").classList.add("hidden");document.getElementById("result").classList.remove("hidden");
+ document.getElementById("score").textContent=`Puanın: ${total} / 9`;
+ const badges=document.getElementById("badges");
+ data.forEach((d,i)=>{if(correctBy[i]>=2)badges.innerHTML+=`<div class="earned">${d.badge}<br><small>Görev ${i+1} tamamlandı</small></div>`});
+ const p=document.getElementById("profile");
+ data.forEach((d,i)=>{let n=correctBy[i];p.innerHTML+=`<div class="skill"><strong>${d.skill}</strong><span class="stars">${"★".repeat(n)}${"☆".repeat(3-n)}</span></div>`});
+ let msg=total>=8?"Harika! Yapay zekayı sorguluyor, bilgileri doğruluyor ve yapay zekayı bilinçli kullanıyorsun.":total>=6?"Tebrikler! Güçlü yapay zeka okuryazarlığı alışkanlıkları geliştiriyorsun.":"İyi bir başlangıç! Pratik yapmaya devam et: yapay zeka okuryazarlığı; sorgulamak, doğrulamak ve bilinçli seçimler yapmak demektir.";
+ document.getElementById("message").textContent=msg;
+}
+</script>
+</body>
+</html>
